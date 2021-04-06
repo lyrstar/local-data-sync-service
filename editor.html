@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>本地数据同步</title>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container pt-4">
+  <div class="row">
+    <div class="col-8">
+      <nav class="mt-2">
+        <h4 class="float-left ml-2">编辑内容</h4>
+        <button id="btn-save" class="btn btn-primary float-right mr-2">保存到本地</button>
+      </nav>
+      <textarea class="mt-4" style="width:100%;height: 800px" id="data"></textarea>
+    </div>
+    <div class="col-4">
+      <h4 class="mt-2 ml-2">本地数据列表</h4>
+      <ul class="list-group list-group-flush overflow-auto mt-4" id="data-list" style="height: 800px"></ul>
+    </div>
+  </div>
+</div>
+</body>
+
+
+<script>
+    $(document).ready(function () {
+        initListData();
+        $("#btn-save").click(function () {
+            var key = 'content';
+            var value = $('#data').val();
+            $.post("http://localhost:13080/data", {key: key, value: value}, function (data) {
+                console.log(data)
+                initListData();
+            });
+        });
+    });
+
+    function initListData() {
+        $.get("http://localhost:13080/list", function (data) {
+            setListData(data);
+        });
+    }
+
+    function setListData(list) {
+        $("#data-list").empty();
+        for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            var key = item.split('_')[0];
+            var arr = item.split('_')[1].split('-');
+            var y = arr[0].substring(0, 4);
+            var M = arr[0].substring(4, 6);
+            var d = arr[0].substring(6, 8);
+            var h = arr[1].substring(0, 2);
+            var m = arr[1].substring(2, 4);
+            var s = arr[1].substring(4, 6);
+            var dateString = `${y}-${M}-${d} ${h}:${m}:${s}`;
+            $("#data-list").prepend(`<li class="list-group-item align-items-center"><button class="btn btn-link mr-2" id="data-list-${i}" onclick="selectListItem('${key}','${dateString}')">使用</button><span>${key}</span><small class="ml-2">${dateString}</small></li>`);
+        }
+    }
+
+    function selectListItem(key, date) {
+        getData('data', key, date);
+    }
+
+    function getData(id, key, date) {
+        $.get("http://localhost:13080/data", {key: key, date: date}, function (data) {
+            $('#data').val(data);
+        });
+    }
+
+</script>
+</html>

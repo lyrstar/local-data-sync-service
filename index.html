@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+    const {app} = require('electron').remote
+    console.log(app.getVersion())
+
+    const fs = require('fs')
+    const root = fs.readdirSync('/')
+    console.log(root)
+
+    const service = require('./service')
+    console.log(service)
+    let dir = service.getDataDir();
+    console.log(dir)
+</script>
+</body>
+</html>
