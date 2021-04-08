@@ -11,28 +11,26 @@ function createWindow() {
         devTools: true,
         titleBarStyle: 'hidden',
         title: '本地数据同步',
-    })
+    });
 
     win.loadFile('index.html')
     win.removeMenu();
     // win.loadURL('https://author.itaotuo.com/editor/')
     win.webContents.openDevTools();
-
-
 }
 
-app.whenReady().then(createWindow)
+// app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
-})
+});
 
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow()
     }
-})
+});
 
 require('./app');

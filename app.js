@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs');
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
@@ -6,10 +7,11 @@ const router = require('koa-router')();
 const app = new Koa();
 
 const service = require('./service');
+const {log, error} = require('./util');
 
 // log request URL:
 app.use(async (ctx, next) => {
-    console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
+    log(`Process ${ctx.request.method} ${ctx.request.url}`);
     if (ctx.request.headers.referer) {
         let domain = new URL(ctx.request.headers.referer).host.replace(/:/g, '_');
         ctx.request.headers.domain = domain
@@ -23,9 +25,9 @@ app.use(async (ctx, next) => {
         await next();
     }
     if (!ctx.request.url.startsWith('/v/')) {
-        console.log(`Response: ${ctx.response.body}`);
+        log(`Response: ${ctx.response.body}`);
     }
-    console.log()
+    log()
 });
 
 app.use(bodyParser());
@@ -34,7 +36,7 @@ app.use(bodyParser());
 
 router.get('/v/editor', async (ctx, next) => {
     ctx.type = "html";
-    ctx.body = fs.readFileSync('editor.html');
+    ctx.body = fs.readFileSync(path.resolve(__dirname, 'editor.html'));
 });
 
 router.get('/homedir', async (ctx, next) => {
@@ -71,8 +73,8 @@ router.post('/data', async (ctx, next) => {
 app.use(router.routes());
 
 app.on('error', (err, ctx) => {
-    console.error(err)
+    error(err)
 });
 
 app.listen(13080);
-console.log('listen: http://localhost:13080');
+log('listen: http://localhost:13080');
